@@ -16,6 +16,8 @@ jobs:
     permissions:
       contents: read
       deployments: write
+    env:
+      HAS_CF_DEPLOY: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
 
     steps:
       - name: Checkout
@@ -34,6 +36,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
+        if: ${{ env.HAS_CF_DEPLOY == 'true' }}
         run: npx wrangler pages deploy dist --project-name ferrywatch --branch main --commit-hash "${{ github.sha }}"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
