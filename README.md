@@ -30,7 +30,7 @@ Set `WSDOT_API_KEY` and `GOOGLE_MAPS_API_KEY` as Pages project secrets, then dep
 npm run deploy
 ```
 
-Pushes to GitHub `main` also deploy through `.github/workflows/deploy-cloudflare-pages.yml` when the repo has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets configured.
+Pushes to GitHub `main` also deploy through `.github/workflows/deploy-cloudflare-pages.yml` when the repo has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_API_TOKEN` secrets configured.
 
 ## Data Used
 
