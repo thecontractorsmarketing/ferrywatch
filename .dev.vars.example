@@ -1,0 +1,3 @@
+﻿WSDOT_API_KEY="paste-your-wsdot-traveler-api-access-code"
+WSDOT_API_ORIGIN="https://www.wsdot.wa.gov"
+GOOGLE_MAPS_API_KEY="paste-your-google-maps-javascript-api-key"

@@ -1,0 +1,18 @@
+{
+  "name": "WSF Ferries",
+  "short_name": "WSF Ferries",
+  "description": "Washington State Ferries route watch for iPhone.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071c26",
+  "theme_color": "#07212d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/ferrywatch.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
