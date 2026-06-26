@@ -4,11 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent } fr
 import { FerryMap } from "./components/FerryMap";
 import type { TerminalTravelTimes } from "./components/FerryMap";
 import { SettingsSheet } from "./components/SettingsSheet";
-import { ROUTES, TERMINALS, getRoute, getTerminal, type Terminal } from "./data/routes";
+import { ROUTES, TERMINALS, getRoute, getTerminal } from "./data/routes";
 import { useFerryData, type FerryPrefs } from "./hooks/useFerryData";
 import { useGeolocation } from "./hooks/useGeolocation";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { distanceMiles } from "./lib/geo";
 import { formatTime, parseWsdotDate, relativeMinutes } from "./lib/time";
 import type { ScheduleTime, TerminalSailingSpaceResponse, VesselLocation } from "./types/wsdot";
 
@@ -132,18 +131,6 @@ function LastChanceBar({
   );
 }
 
-function getDisplayTerminalAbbrev(terminal: Pick<Terminal, "id" | "abbrev" | "shortName">) {
-  if (terminal.id === 7) {
-    return "SEA";
-  }
-
-  if (terminal.id === 3) {
-    return "BBI";
-  }
-
-  return terminal.abbrev || terminal.shortName;
-}
-
 function vesselHasDeparted(vessel: VesselLocation) {
   return Boolean(parseWsdotDate(vessel.LeftDock)) || (vessel.Speed || 0) > 0.5;
 }
@@ -176,16 +163,6 @@ function getVesselStatus(vessel: VesselLocation | null) {
   }
 
   return "Docked";
-}
-
-function getTravelStatusClass(travelMinutes: number | null | undefined, departure: string | Date | null | undefined) {
-  const departureDate = toDate(departure);
-  if (!travelMinutes || !departureDate) {
-    return undefined;
-  }
-
-  const minutesUntilDeparture = (departureDate.getTime() - Date.now()) / 60000;
-  return minutesUntilDeparture - travelMinutes >= 5 ? "is-travel-safe" : "is-travel-tight";
 }
 
 function vesselMatchesSailingTime(vessel: VesselLocation, sailingDeparture: Date | null) {
@@ -303,7 +280,6 @@ export function App() {
   const { data, plan, terminals } = useFerryData(route, prefs, location, refreshKey);
   const departingTerminal = getTerminal(plan.departingTerminalId, terminals) || TERMINALS[route.defaultDepartureTerminalId];
   const arrivingTerminal = getTerminal(plan.arrivingTerminalId, terminals) || TERMINALS[route.terminalIds[1]];
-  const departingTerminalLabel = getDisplayTerminalAbbrev(departingTerminal);
   const activeVessel = data?.activeVessel || null;
   const incomingSailing = data?.incomingSailing || null;
   const nextSailing = data?.nextSailing || null;
@@ -360,32 +336,8 @@ export function App() {
     ]
   );
 
-  const hasTerminalTravelTimes = Boolean(terminalTravelTimes?.driveText || terminalTravelTimes?.walkText);
   const outgoingDeparture = nextSailing?.DepartingTime;
   const estimatedOutgoingDeparture = getEstimatedOutgoingDeparture(nextSailing, data?.routeVessels, plan);
-  const driveTravelClass = getTravelStatusClass(terminalTravelTimes?.driveMinutes, outgoingDeparture);
-  const walkTravelClass = getTravelStatusClass(terminalTravelTimes?.walkMinutes, outgoingDeparture);
-  const locationDetail =
-    location && departingTerminal
-      ? hasTerminalTravelTimes
-        ? (
-            <>
-              {terminalTravelTimes?.driveText ? <span className={driveTravelClass}>{terminalTravelTimes.driveText} drive</span> : null}
-              {terminalTravelTimes?.walkText ? <span className={walkTravelClass}>{terminalTravelTimes.walkText} walk</span> : null}
-            </>
-          )
-        : <span>{distanceMiles(location, departingTerminal).toFixed(1)} mi away</span>
-      : locationStatus === "requesting"
-        ? <span>Locating</span>
-        : <span>Location off</span>;
-  const departureDetail = (
-    <>
-      {estimatedOutgoingDeparture ? (
-        <span className="departure-estimate">Estimated {formatTime(estimatedOutgoingDeparture)}</span>
-      ) : null}
-      {locationDetail}
-    </>
-  );
 
   useEffect(() => {
     setTerminalTravelTimes(null);
@@ -574,9 +526,10 @@ export function App() {
             icon={<Navigation size={19} />}
           />
           <StatCard
-            label={`Departing ${departingTerminalLabel}`}
-            detail={departureDetail}
-            detailClassName="travel-stack"
+            label="Estimated departure"
+            value={formatTime(estimatedOutgoingDeparture)}
+            detail={relativeMinutes(estimatedOutgoingDeparture)}
+            icon={<Navigation size={19} />}
           />
         </section>
 
