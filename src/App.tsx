@@ -155,7 +155,7 @@ function isPastScheduledDeparture(vessel: VesselLocation) {
 
 function getVesselStatus(vessel: VesselLocation | null) {
   if (!vessel) {
-    return "The ferry is docked";
+    return "Docked";
   }
 
   if (isPastScheduledDeparture(vessel) && !vesselHasDeparted(vessel)) {
@@ -168,14 +168,14 @@ function getVesselStatus(vessel: VesselLocation | null) {
   }
 
   if (vessel.AtDock) {
-    return "The ferry is docked";
+    return "Docked";
   }
 
   if ((vessel.Speed || 0) > 0.5) {
     return "Underway";
   }
 
-  return "The ferry is docked";
+  return "Docked";
 }
 
 function getTravelStatusClass(travelMinutes: number | null | undefined, departure: string | Date | null | undefined) {
