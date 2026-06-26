@@ -20,6 +20,8 @@ const DEFAULT_PREFS: FerryPrefs = {
 
 const PULL_REFRESH_THRESHOLD = 40;
 const DEFAULT_TURNAROUND_MINUTES = 20;
+const LAST_CHANCE_BUFFER_MINUTES = 5;
+const MISSED_SCHEDULED_DEPARTURE_MESSAGE = "You\u2019ll probably miss the scheduled departure time";
 
 function StatCard({
   label,
@@ -55,6 +57,70 @@ function addMinutes(value: string | Date | null | undefined, minutes: number) {
 
 function toDate(value: string | Date | null | undefined) {
   return value instanceof Date ? value : parseWsdotDate(value);
+}
+
+function formatCountdownMs(value: number) {
+  const totalSeconds = Math.ceil(value / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const paddedSeconds = seconds.toString().padStart(2, "0");
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${paddedSeconds}`;
+  }
+
+  return `${minutes}:${paddedSeconds}`;
+}
+
+function getLastChanceCountdown(
+  departure: string | Date | null | undefined,
+  driveMinutes: number | null | undefined,
+  nowMs: number
+) {
+  const departureDate = toDate(departure);
+  if (!departureDate) {
+    return { label: "No scheduled departure", status: "unavailable" };
+  }
+
+  if (typeof driveMinutes !== "number" || !Number.isFinite(driveMinutes) || driveMinutes < 0) {
+    return { label: "Waiting for drive time", status: "waiting" };
+  }
+
+  const leaveByMs = departureDate.getTime() - (LAST_CHANCE_BUFFER_MINUTES + driveMinutes) * 60000;
+  const remainingMs = leaveByMs - nowMs;
+  if (remainingMs <= 0) {
+    return { label: MISSED_SCHEDULED_DEPARTURE_MESSAGE, status: "missed" };
+  }
+
+  return { label: formatCountdownMs(remainingMs), status: "countdown" };
+}
+
+function LastChanceBar({
+  departure,
+  driveMinutes
+}: {
+  departure: string | Date | null | undefined;
+  driveMinutes: number | null | undefined;
+}) {
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const countdown = getLastChanceCountdown(departure, driveMinutes, nowMs);
+
+  return (
+    <div className={`last-chance-bar is-${countdown.status}`}>
+      <span className="last-chance-label">Last chance to leave and make it</span>
+      <strong className="last-chance-value">{countdown.label}</strong>
+    </div>
+  );
 }
 
 function getDisplayTerminalAbbrev(terminal: Pick<Terminal, "id" | "abbrev" | "shortName">) {
@@ -209,7 +275,7 @@ export function App() {
   const pullActive = useRef(false);
   const pullDistanceValue = useRef(0);
   const pullStartY = useRef<number | null>(null);
-  const { location, status: locationStatus, requestLocation } = useGeolocation();
+  const { location, status: locationStatus, locationEnabled, requestLocation, setLocationEnabled } = useGeolocation();
 
   useEffect(() => {
     window.history.scrollRestoration = "manual";
@@ -463,6 +529,7 @@ export function App() {
               <strong>{getVesselStatus(activeVessel)}</strong>
             </span>
           </button>
+          <LastChanceBar departure={outgoingDeparture} driveMinutes={terminalTravelTimes?.driveMinutes} />
         </section>
 
         <section className="stats-grid" aria-label="Ferry timing">
@@ -539,9 +606,11 @@ export function App() {
           open={settingsOpen}
           prefs={prefs}
           route={route}
+          locationEnabled={locationEnabled}
           locationStatus={locationStatus}
           onClose={() => setSettingsOpen(false)}
           onRequestLocation={requestLocation}
+          onLocationEnabledChange={setLocationEnabled}
           onPrefsChange={setPrefs}
         />
       </section>

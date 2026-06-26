@@ -6,9 +6,11 @@ type SettingsSheetProps = {
   open: boolean;
   prefs: FerryPrefs;
   route: FerryRoute;
+  locationEnabled: boolean;
   locationStatus: string;
   onClose: () => void;
   onRequestLocation: () => void;
+  onLocationEnabledChange: (enabled: boolean) => void;
   onPrefsChange: (prefs: FerryPrefs) => void;
 };
 
@@ -16,9 +18,11 @@ export function SettingsSheet({
   open,
   prefs,
   route,
+  locationEnabled,
   locationStatus,
   onClose,
   onRequestLocation,
+  onLocationEnabledChange,
   onPrefsChange
 }: SettingsSheetProps) {
   if (!open) {
@@ -28,6 +32,12 @@ export function SettingsSheet({
   const updatePrefs = (updates: Partial<FerryPrefs>) => {
     onPrefsChange({ ...prefs, ...updates });
   };
+  let locationLabel = "Off";
+  if (locationStatus === "denied") {
+    locationLabel = "Blocked";
+  } else if (locationEnabled) {
+    locationLabel = locationStatus === "requesting" ? "Updating" : "On";
+  }
 
   return (
     <div className="sheet-backdrop">
@@ -98,10 +108,27 @@ export function SettingsSheet({
             })}
           </div>
 
-          <button className="location-button" type="button" onClick={onRequestLocation}>
-            <LocateFixed size={18} />
-            <span>{locationStatus === "ready" ? "Location ready" : "Use location"}</span>
-          </button>
+          <div className="setting-row">
+            <div>
+              <p className="section-label">Current location</p>
+              <strong>{locationLabel}</strong>
+            </div>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={locationEnabled}
+                onChange={(event) => onLocationEnabledChange(event.currentTarget.checked)}
+              />
+              <span />
+            </label>
+          </div>
+
+          {locationEnabled ? (
+            <button className="location-button" type="button" onClick={onRequestLocation}>
+              <LocateFixed size={18} />
+              <span>{locationStatus === "requesting" ? "Updating location" : "Refresh location"}</span>
+            </button>
+          ) : null}
         </div>
       </section>
     </div>
