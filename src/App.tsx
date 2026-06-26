@@ -251,26 +251,46 @@ function getDriveUpSpacesForSailing(
   return arrivalSpace.DriveUpSpaceCount;
 }
 
-function getEstimatedOutgoingDeparture(
-  nextSailing: ScheduleTime | null,
-  routeVessels: VesselLocation[] | undefined,
+function vesselCanTurnAroundForPlan(
+  vessel: VesselLocation | null | undefined,
   plan: { departingTerminalId: number; arrivingTerminalId: number }
 ) {
+  return Boolean(
+    vessel &&
+      vessel.DepartingTerminalID === plan.arrivingTerminalId &&
+      vessel.ArrivingTerminalID === plan.departingTerminalId &&
+      toDate(vessel.Eta)
+  );
+}
+
+function getTurnaroundVessel(
+  nextSailing: ScheduleTime | null,
+  routeVessels: VesselLocation[] | undefined,
+  plan: { departingTerminalId: number; arrivingTerminalId: number },
+  activeIncomingVessel: VesselLocation | null
+) {
+  const assignedIncomingVessel = nextSailing?.VesselID
+    ? routeVessels?.find(
+        (vessel) =>
+          vessel.VesselID === nextSailing.VesselID &&
+          vesselCanTurnAroundForPlan(vessel, plan)
+      )
+    : null;
+
+  if (assignedIncomingVessel) {
+    return assignedIncomingVessel;
+  }
+
+  return vesselCanTurnAroundForPlan(activeIncomingVessel, plan) ? activeIncomingVessel : null;
+}
+
+function getEstimatedOutgoingDeparture(nextSailing: ScheduleTime | null, turnaroundVessel: VesselLocation | null) {
   const scheduledDeparture = toDate(nextSailing?.DepartingTime);
   if (!scheduledDeparture) {
     return null;
   }
 
-  const assignedIncomingVessel = nextSailing?.VesselID
-    ? routeVessels?.find(
-        (vessel) =>
-          vessel.VesselID === nextSailing.VesselID &&
-          vessel.DepartingTerminalID === plan.arrivingTerminalId &&
-          vessel.ArrivingTerminalID === plan.departingTerminalId &&
-          Boolean(toDate(vessel.Eta))
-      )
-    : null;
-  const turnaroundDeparture = addMinutes(assignedIncomingVessel?.Eta, DEFAULT_TURNAROUND_MINUTES);
+  const turnaroundDeparture = addMinutes(turnaroundVessel?.Eta, DEFAULT_TURNAROUND_MINUTES);
 
   if (turnaroundDeparture && turnaroundDeparture.getTime() > scheduledDeparture.getTime()) {
     return turnaroundDeparture;
@@ -365,7 +385,8 @@ export function App() {
   );
 
   const outgoingDeparture = nextSailing?.DepartingTime;
-  const estimatedOutgoingDeparture = getEstimatedOutgoingDeparture(nextSailing, data?.routeVessels, plan);
+  const turnaroundVessel = getTurnaroundVessel(nextSailing, data?.routeVessels, plan, activeVessel);
+  const estimatedOutgoingDeparture = getEstimatedOutgoingDeparture(nextSailing, turnaroundVessel);
   const driveTravelClass = getTravelStatusClass(terminalTravelTimes?.driveMinutes, outgoingDeparture);
   const walkTravelClass = getTravelStatusClass(terminalTravelTimes?.walkMinutes, outgoingDeparture);
 
@@ -377,16 +398,16 @@ export function App() {
     setTerminalTravelTimes(travelTimes);
   }, []);
 
-  const activeVesselDeparted = activeVessel ? vesselHasDeparted(activeVessel) : false;
+  const turnaroundVesselDeparted = turnaroundVessel ? vesselHasDeparted(turnaroundVessel) : false;
   const estimatedArrival =
-    activeVessel?.Eta ||
-    (activeVesselDeparted
-      ? addMinutes(activeVessel?.LeftDock || incomingSailing?.DepartingTime || activeVessel?.ScheduledDeparture, route.crossingMinutes)
+    turnaroundVessel?.Eta ||
+    (turnaroundVesselDeparted
+      ? addMinutes(turnaroundVessel?.LeftDock || incomingSailing?.DepartingTime || turnaroundVessel?.ScheduledDeparture, route.crossingMinutes)
       : null);
   const scheduledArrival =
     incomingSailing?.ArrivingTime ||
-    (activeVesselDeparted
-      ? addMinutes(activeVessel?.ScheduledDeparture || incomingSailing?.DepartingTime, route.crossingMinutes)
+    (turnaroundVesselDeparted
+      ? addMinutes(turnaroundVessel?.ScheduledDeparture || incomingSailing?.DepartingTime, route.crossingMinutes)
       : null);
   const estimatedArrivalDate = toDate(estimatedArrival);
   const scheduledArrivalDate = toDate(scheduledArrival);
