@@ -67,7 +67,7 @@ export function useFerryData(route: FerryRoute, prefs: FerryPrefs, userLocation:
     });
 
     return () => controller.abort();
-  }, [plan, refreshKey, route]);
+  }, [plan.departingTerminalId, plan.arrivingTerminalId, refreshKey, route]);
 
   return state;
 }

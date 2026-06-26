@@ -504,7 +504,6 @@ export function FerryMap({
         }
 
         console.warn("Google Routes API request failed", error);
-        onTerminalTravelTimeChange?.(null);
       });
 
     return () => abortController.abort();

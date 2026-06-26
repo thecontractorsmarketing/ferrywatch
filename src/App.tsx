@@ -380,7 +380,7 @@ export function App() {
 
   useEffect(() => {
     setTerminalTravelTimes(null);
-  }, [departingTerminal.id, location?.lat, location?.lng]);
+  }, [departingTerminal.id]);
 
   const handleTerminalTravelTimeChange = useCallback((travelTimes: TerminalTravelTimes | null) => {
     setTerminalTravelTimes(travelTimes);
@@ -529,7 +529,7 @@ export function App() {
               <strong>{getVesselStatus(activeVessel)}</strong>
             </span>
           </button>
-          <LastChanceBar departure={outgoingDeparture} driveMinutes={terminalTravelTimes?.driveMinutes} />
+          <LastChanceBar departure={outgoingDeparture} driveMinutes={location ? terminalTravelTimes?.driveMinutes : null} />
         </section>
 
         <section className="stats-grid" aria-label="Ferry timing">
