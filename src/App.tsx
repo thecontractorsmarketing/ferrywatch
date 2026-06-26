@@ -126,7 +126,7 @@ function LastChanceBar({
 
   return (
     <div className={`last-chance-bar is-${variant} is-${countdown.status}`}>
-      <span className="last-chance-label">{label}</span>
+      {countdown.status !== "missed" ? <span className="last-chance-label">{label}</span> : null}
       <strong className="last-chance-value">{countdown.label}</strong>
     </div>
   );
