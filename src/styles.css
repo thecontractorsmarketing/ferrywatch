@@ -362,9 +362,8 @@ button {
   background: #68342f;
 }
 
-.last-chance-bar.is-missed .last-chance-value {
+.last-chance-bar.is-missed .last-chance-label {
   flex-basis: 100%;
-  white-space: normal;
 }
 
 .stats-grid {

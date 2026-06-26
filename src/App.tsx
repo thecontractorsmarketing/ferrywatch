@@ -139,11 +139,12 @@ function LastChanceBar({
   }, []);
 
   const countdown = getLastChanceCountdown(departure, driveMinutes, nowMs, missedMessage);
+  const isMissed = countdown.status === "missed";
 
   return (
     <div className={`last-chance-bar is-${variant} is-${countdown.status}`}>
-      {countdown.status !== "missed" ? <span className="last-chance-label">{label}</span> : null}
-      <strong className="last-chance-value">{countdown.label}</strong>
+      <span className="last-chance-label">{isMissed ? countdown.label : label}</span>
+      {!isMissed ? <strong className="last-chance-value">{countdown.label}</strong> : null}
     </div>
   );
 }
