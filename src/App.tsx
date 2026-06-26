@@ -84,7 +84,7 @@ function getLastChanceCountdown(
   }
 
   if (typeof driveMinutes !== "number" || !Number.isFinite(driveMinutes) || driveMinutes < 0) {
-    return { label: "Waiting for drive time", status: "waiting" };
+    return { label: "--", status: "waiting" };
   }
 
   const leaveByMs = departureDate.getTime() - (LAST_CHANCE_BUFFER_MINUTES + driveMinutes) * 60000;
