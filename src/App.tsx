@@ -99,10 +99,14 @@ function getLastChanceCountdown(
 
 function LastChanceBar({
   departure,
-  driveMinutes
+  driveMinutes,
+  label,
+  variant = "scheduled"
 }: {
   departure: string | Date | null | undefined;
   driveMinutes: number | null | undefined;
+  label: string;
+  variant?: "scheduled" | "estimated";
 }) {
   const [nowMs, setNowMs] = useState(() => Date.now());
 
@@ -117,8 +121,8 @@ function LastChanceBar({
   const countdown = getLastChanceCountdown(departure, driveMinutes, nowMs);
 
   return (
-    <div className={`last-chance-bar is-${countdown.status}`}>
-      <span className="last-chance-label">Last chance to leave and make it</span>
+    <div className={`last-chance-bar is-${variant} is-${countdown.status}`}>
+      <span className="last-chance-label">{label}</span>
       <strong className="last-chance-value">{countdown.label}</strong>
     </div>
   );
@@ -530,7 +534,17 @@ export function App() {
               <strong>{getVesselStatus(activeVessel)}</strong>
             </span>
           </button>
-          <LastChanceBar departure={outgoingDeparture} driveMinutes={location ? terminalTravelTimes?.driveMinutes : null} />
+          <LastChanceBar
+            departure={outgoingDeparture}
+            driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
+            label="Last chance for scheduled departure"
+          />
+          <LastChanceBar
+            departure={estimatedOutgoingDeparture}
+            driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
+            label="Last chance for estimated departure"
+            variant="estimated"
+          />
         </section>
 
         <section className="stats-grid" aria-label="Ferry timing">

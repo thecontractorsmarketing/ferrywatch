@@ -326,6 +326,10 @@ button {
   background: #0f3d37;
 }
 
+.last-chance-bar.is-estimated {
+  background: #17415a;
+}
+
 .last-chance-label,
 .last-chance-value {
   min-width: 0;
