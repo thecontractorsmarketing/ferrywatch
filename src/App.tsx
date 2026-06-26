@@ -22,7 +22,8 @@ const PULL_REFRESH_THRESHOLD = 40;
 const FERRY_REFRESH_MS = 15000;
 const DEFAULT_TURNAROUND_MINUTES = 20;
 const LAST_CHANCE_BUFFER_MINUTES = 5;
-const MISSED_SCHEDULED_DEPARTURE_MESSAGE = "You\u2019ll probably miss the scheduled departure time";
+const MISSED_SCHEDULED_DEPARTURE_MESSAGE = "You'll probably miss the scheduled departure";
+const MISSED_ESTIMATED_DEPARTURE_MESSAGE = "You'll probably miss the estimated departure";
 
 function StatCard({
   label,
@@ -77,7 +78,8 @@ function formatCountdownMs(value: number) {
 function getLastChanceCountdown(
   departure: string | Date | null | undefined,
   driveMinutes: number | null | undefined,
-  nowMs: number
+  nowMs: number,
+  missedMessage: string
 ) {
   const departureDate = toDate(departure);
   if (!departureDate) {
@@ -91,7 +93,7 @@ function getLastChanceCountdown(
   const leaveByMs = departureDate.getTime() - (LAST_CHANCE_BUFFER_MINUTES + driveMinutes) * 60000;
   const remainingMs = leaveByMs - nowMs;
   if (remainingMs <= 0) {
-    return { label: MISSED_SCHEDULED_DEPARTURE_MESSAGE, status: "missed" };
+    return { label: missedMessage, status: "missed" };
   }
 
   return { label: formatCountdownMs(remainingMs), status: "countdown" };
@@ -101,11 +103,13 @@ function LastChanceBar({
   departure,
   driveMinutes,
   label,
+  missedMessage,
   variant = "scheduled"
 }: {
   departure: string | Date | null | undefined;
   driveMinutes: number | null | undefined;
   label: string;
+  missedMessage: string;
   variant?: "scheduled" | "estimated";
 }) {
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -118,7 +122,7 @@ function LastChanceBar({
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const countdown = getLastChanceCountdown(departure, driveMinutes, nowMs);
+  const countdown = getLastChanceCountdown(departure, driveMinutes, nowMs, missedMessage);
 
   return (
     <div className={`last-chance-bar is-${variant} is-${countdown.status}`}>
@@ -538,11 +542,13 @@ export function App() {
             departure={outgoingDeparture}
             driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
             label="Last chance to leave and make the scheduled departure"
+            missedMessage={MISSED_SCHEDULED_DEPARTURE_MESSAGE}
           />
           <LastChanceBar
             departure={estimatedOutgoingDeparture}
             driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
             label="Last chance to leave and make the estimated departure"
+            missedMessage={MISSED_ESTIMATED_DEPARTURE_MESSAGE}
             variant="estimated"
           />
         </section>
