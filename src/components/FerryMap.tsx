@@ -20,7 +20,6 @@ type GoogleMapsLoaderResult = {
   mapLibrary: GoogleMapLibrary;
   apiKey: string;
 };
-type MapOverlay = google.maps.Marker | google.maps.Polyline | google.maps.TrafficLayer;
 type RouteApiResponse = {
   routes?: Array<{
     duration?: string;
@@ -67,8 +66,16 @@ function vesselColor(vessel: VesselLocation, departingTerminalId: number, arrivi
   return "#0f3d37";
 }
 
+function vesselHeading(vessel: VesselLocation) {
+  return Number.isFinite(vessel.Heading) ? Math.round(vessel.Heading || 0) : 0;
+}
+
+function vesselIconKey(vessel: VesselLocation, departingTerminalId: number, arrivingTerminalId: number) {
+  return `${vesselHeading(vessel)}:${vesselColor(vessel, departingTerminalId, arrivingTerminalId)}`;
+}
+
 function vesselIcon(maps: GoogleMapsNamespace, vessel: VesselLocation, departingTerminalId: number, arrivingTerminalId: number) {
-  const heading = Number.isFinite(vessel.Heading) ? vessel.Heading || 0 : 0;
+  const heading = vesselHeading(vessel);
   const fill = vesselColor(vessel, departingTerminalId, arrivingTerminalId);
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
@@ -161,10 +168,15 @@ async function loadGoogleMaps() {
   return mapsPromise;
 }
 
-function clearOverlays(overlays: MapOverlay[]) {
-  for (const overlay of overlays) {
-    overlay.setMap(null);
+function clearMarkerMap(markers: Map<number, google.maps.Marker>) {
+  for (const marker of markers.values()) {
+    marker.setMap(null);
   }
+  markers.clear();
+}
+
+function removeOverlay(overlay: google.maps.Marker | google.maps.Polyline | google.maps.TrafficLayer | null) {
+  overlay?.setMap(null);
 }
 
 function decodePolyline(encoded: string) {
@@ -292,7 +304,12 @@ export function FerryMap({
   const mapRef = useRef<google.maps.Map | null>(null);
   const mapsRef = useRef<GoogleMapsNamespace | null>(null);
   const apiKeyRef = useRef("");
-  const overlaysRef = useRef<MapOverlay[]>([]);
+  const vesselMarkersRef = useRef(new Map<number, google.maps.Marker>());
+  const vesselIconKeysRef = useRef(new Map<number, string>());
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
+  const routeLineRef = useRef<google.maps.Polyline | null>(null);
+  const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null);
+  const viewportKeyRef = useRef("");
   const terminalRouteCache = useRef(new Map<string, CachedTerminalRoute>());
   const routeRequestId = useRef(0);
   const [mapError, setMapError] = useState("");
@@ -347,8 +364,15 @@ export function FerryMap({
 
     return () => {
       cancelled = true;
-      clearOverlays(overlaysRef.current);
-      overlaysRef.current = [];
+      clearMarkerMap(vesselMarkersRef.current);
+      vesselIconKeysRef.current.clear();
+      removeOverlay(userMarkerRef.current);
+      removeOverlay(routeLineRef.current);
+      removeOverlay(trafficLayerRef.current);
+      userMarkerRef.current = null;
+      routeLineRef.current = null;
+      trafficLayerRef.current = null;
+      viewportKeyRef.current = "";
       apiKeyRef.current = "";
       mapRef.current = null;
       setMapReady(false);
@@ -364,17 +388,20 @@ export function FerryMap({
       return;
     }
 
-    clearOverlays(overlaysRef.current);
-    overlaysRef.current = [];
     routeRequestId.current += 1;
     const requestId = routeRequestId.current;
     const abortController = new AbortController();
-    const trafficLayer = new maps.TrafficLayer();
-    trafficLayer.setMap(map);
-    overlaysRef.current.push(trafficLayer);
+
+    if (!trafficLayerRef.current) {
+      trafficLayerRef.current = new maps.TrafficLayer();
+      trafficLayerRef.current.setMap(map);
+    }
 
     const bounds = new maps.LatLngBounds();
     const departingTerminal = terminals[departingTerminalId];
+    const visibleVesselIds = new Set<number>();
+    const viewportKey = `${departingTerminalId}:${arrivingTerminalId}:${userLocation ? "with-user" : "no-user"}`;
+    const shouldFitViewport = viewportKeyRef.current !== viewportKey;
 
     for (const terminal of routeTerminals) {
       const position = { lat: terminal.lat, lng: terminal.lng };
@@ -387,34 +414,72 @@ export function FerryMap({
       }
 
       const position = { lat: vessel.Latitude, lng: vessel.Longitude };
+      const zIndex = vessel.VesselID === activeVesselId ? 50 : 40;
+      const iconKey = vesselIconKey(vessel, departingTerminalId, arrivingTerminalId);
       bounds.extend(position);
-      overlaysRef.current.push(
-        new maps.Marker({
-          map,
-          position,
-          title: vessel.VesselName,
-          icon: vesselIcon(maps, vessel, departingTerminalId, arrivingTerminalId),
-          zIndex: vessel.VesselID === activeVesselId ? 50 : 40
-        })
-      );
+      visibleVesselIds.add(vessel.VesselID);
+
+      const marker = vesselMarkersRef.current.get(vessel.VesselID);
+      if (marker) {
+        marker.setPosition(position);
+        marker.setTitle(vessel.VesselName);
+        if (vesselIconKeysRef.current.get(vessel.VesselID) !== iconKey) {
+          marker.setIcon(vesselIcon(maps, vessel, departingTerminalId, arrivingTerminalId));
+          vesselIconKeysRef.current.set(vessel.VesselID, iconKey);
+        }
+        marker.setZIndex(zIndex);
+        if (!marker.getMap()) {
+          marker.setMap(map);
+        }
+      } else {
+        vesselMarkersRef.current.set(
+          vessel.VesselID,
+          new maps.Marker({
+            map,
+            position,
+            title: vessel.VesselName,
+            icon: vesselIcon(maps, vessel, departingTerminalId, arrivingTerminalId),
+            zIndex
+          })
+        );
+        vesselIconKeysRef.current.set(vessel.VesselID, iconKey);
+      }
+    }
+
+    for (const [vesselId, marker] of vesselMarkersRef.current) {
+      if (!visibleVesselIds.has(vesselId)) {
+        marker.setMap(null);
+        vesselMarkersRef.current.delete(vesselId);
+        vesselIconKeysRef.current.delete(vesselId);
+      }
     }
 
     if (userLocation) {
       const position = { lat: userLocation.lat, lng: userLocation.lng };
       bounds.extend(position);
-      overlaysRef.current.push(
-        new maps.Marker({
+
+      if (userMarkerRef.current) {
+        userMarkerRef.current.setPosition(position);
+        if (!userMarkerRef.current.getMap()) {
+          userMarkerRef.current.setMap(map);
+        }
+      } else {
+        userMarkerRef.current = new maps.Marker({
           map,
           position,
           title: "You",
           icon: userIcon(maps),
           zIndex: 60
-        })
-      );
+        });
+      }
+    } else if (userMarkerRef.current) {
+      userMarkerRef.current.setMap(null);
+      userMarkerRef.current = null;
     }
 
-    if (!bounds.isEmpty()) {
+    if (shouldFitViewport && !bounds.isEmpty()) {
       map.fitBounds(bounds, { top: 28, right: 28, bottom: 28, left: 28 });
+      viewportKeyRef.current = viewportKey;
       maps.event.addListenerOnce(map, "idle", () => {
         const zoom = map.getZoom();
         if (zoom && zoom > 12) {
@@ -424,6 +489,8 @@ export function FerryMap({
     }
 
     if (!userLocation || !departingTerminal || !apiKey) {
+      removeOverlay(routeLineRef.current);
+      routeLineRef.current = null;
       onTerminalTravelTimeChange?.(null);
       return () => abortController.abort();
     }
@@ -456,29 +523,23 @@ export function FerryMap({
       });
 
       if (terminalRoute.path.length < 2) {
+        removeOverlay(routeLineRef.current);
+        routeLineRef.current = null;
         return;
       }
 
-      const routeLine = new maps.Polyline({
-        map,
-        path: terminalRoute.path,
-        strokeColor: "#2563eb",
-        strokeOpacity: 0.48,
-        strokeWeight: 3
-      });
-      overlaysRef.current.push(routeLine);
-
-      const routeBounds = new maps.LatLngBounds();
-      for (const point of terminalRoute.path) {
-        routeBounds.extend(point);
+      if (routeLineRef.current) {
+        routeLineRef.current.setPath(terminalRoute.path);
+      } else {
+        routeLineRef.current = new maps.Polyline({
+          map,
+          path: terminalRoute.path,
+          strokeColor: "#2563eb",
+          strokeOpacity: 0.48,
+          strokeWeight: 3
+        });
       }
 
-      if (!bounds.isEmpty()) {
-        const combinedBounds = new maps.LatLngBounds();
-        combinedBounds.union(bounds);
-        combinedBounds.union(routeBounds);
-        map.fitBounds(combinedBounds, { top: 28, right: 28, bottom: 28, left: 28 });
-      }
     };
 
     const cachedRoute = terminalRouteCache.current.get(cacheKey);

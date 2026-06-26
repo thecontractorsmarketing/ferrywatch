@@ -19,6 +19,7 @@ const DEFAULT_PREFS: FerryPrefs = {
 };
 
 const PULL_REFRESH_THRESHOLD = 40;
+const FERRY_REFRESH_MS = 15000;
 const DEFAULT_TURNAROUND_MINUTES = 20;
 const LAST_CHANCE_BUFFER_MINUTES = 5;
 const MISSED_SCHEDULED_DEPARTURE_MESSAGE = "You\u2019ll probably miss the scheduled departure time";
@@ -285,7 +286,7 @@ export function App() {
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setRefreshKey((current) => current + 1);
-    }, 8000);
+    }, FERRY_REFRESH_MS);
 
     return () => window.clearInterval(intervalId);
   }, []);

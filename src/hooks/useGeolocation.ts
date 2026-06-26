@@ -5,7 +5,7 @@ type LocationStatus = "idle" | "requesting" | "ready" | "denied" | "unavailable"
 type LocationPreference = "enabled" | "disabled";
 
 const LOCATION_PREF_KEY = "ferrywatch:location-enabled";
-const LOCATION_REFRESH_MS = 10000;
+const LOCATION_REFRESH_MS = 15000;
 const LOCATION_REQUEST_THROTTLE_MS = 1000;
 const LOCATION_OPTIONS: PositionOptions = {
   enableHighAccuracy: true,
