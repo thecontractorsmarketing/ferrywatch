@@ -51,6 +51,23 @@ function StatCard({
   );
 }
 
+function TravelTimeCard({
+  label,
+  value,
+  valueClassName
+}: {
+  label: string;
+  value?: string | null;
+  valueClassName?: string;
+}) {
+  return (
+    <article className="travel-card">
+      <span>{label}</span>
+      <strong className={valueClassName}>{value || "--"}</strong>
+    </article>
+  );
+}
+
 function addMinutes(value: string | Date | null | undefined, minutes: number) {
   const date = value instanceof Date ? value : parseWsdotDate(value);
   return date ? new Date(date.getTime() + minutes * 60000) : null;
@@ -163,6 +180,16 @@ function getVesselStatus(vessel: VesselLocation | null) {
   }
 
   return "Docked";
+}
+
+function getTravelStatusClass(travelMinutes: number | null | undefined, departure: string | Date | null | undefined) {
+  const departureDate = toDate(departure);
+  if (!travelMinutes || !departureDate) {
+    return undefined;
+  }
+
+  const minutesUntilDeparture = (departureDate.getTime() - Date.now()) / 60000;
+  return minutesUntilDeparture - travelMinutes >= 5 ? "is-travel-safe" : "is-travel-tight";
 }
 
 function vesselMatchesSailingTime(vessel: VesselLocation, sailingDeparture: Date | null) {
@@ -338,6 +365,8 @@ export function App() {
 
   const outgoingDeparture = nextSailing?.DepartingTime;
   const estimatedOutgoingDeparture = getEstimatedOutgoingDeparture(nextSailing, data?.routeVessels, plan);
+  const driveTravelClass = getTravelStatusClass(terminalTravelTimes?.driveMinutes, outgoingDeparture);
+  const walkTravelClass = getTravelStatusClass(terminalTravelTimes?.walkMinutes, outgoingDeparture);
 
   useEffect(() => {
     setTerminalTravelTimes(null);
@@ -530,6 +559,16 @@ export function App() {
             value={formatTime(estimatedOutgoingDeparture)}
             detail={relativeMinutes(estimatedOutgoingDeparture)}
             icon={<Navigation size={19} />}
+          />
+          <TravelTimeCard
+            label="Drive time"
+            value={terminalTravelTimes?.driveText}
+            valueClassName={driveTravelClass}
+          />
+          <TravelTimeCard
+            label="Walk time"
+            value={terminalTravelTimes?.walkText}
+            valueClassName={walkTravelClass}
           />
         </section>
 

@@ -148,6 +148,7 @@ button {
 
 .route-card,
 .stat-card,
+.travel-card,
 .schedule-panel {
   border: 1px solid rgba(16, 37, 34, 0.09);
   border-radius: 8px;
@@ -396,6 +397,47 @@ button {
 }
 
 .stat-card strong.is-late-arrival {
+  color: #a85c55;
+}
+
+.travel-card {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.travel-card span {
+  min-width: 0;
+  overflow: hidden;
+  color: #65726b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.travel-card strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #102522;
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.travel-card strong.is-travel-safe {
+  color: #0f766e;
+}
+
+.travel-card strong.is-travel-tight {
   color: #a85c55;
 }
 
