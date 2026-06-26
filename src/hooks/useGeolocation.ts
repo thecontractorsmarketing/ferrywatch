@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { LatLng } from "../data/routes";
 
 type LocationStatus = "idle" | "requesting" | "ready" | "denied" | "unavailable";
-type LocationPreference = "unset" | "enabled" | "disabled";
+type LocationPreference = "enabled" | "disabled";
 
 const LOCATION_PREF_KEY = "ferrywatch:location-enabled";
 const LOCATION_REFRESH_MS = 10000;
@@ -16,9 +16,9 @@ const LOCATION_OPTIONS: PositionOptions = {
 function readLocationPreference(): LocationPreference {
   try {
     const stored = window.localStorage.getItem(LOCATION_PREF_KEY);
-    return stored === "enabled" || stored === "disabled" ? stored : "unset";
+    return stored === "disabled" ? "disabled" : "enabled";
   } catch {
-    return "unset";
+    return "enabled";
   }
 }
 
@@ -107,50 +107,6 @@ export function useGeolocation() {
   const requestLocation = useCallback(() => {
     setLocationEnabled(true);
   }, [setLocationEnabled]);
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setStatus("unavailable");
-      return;
-    }
-
-    if (preference !== "unset" || !navigator.permissions?.query) {
-      return;
-    }
-
-    let cancelled = false;
-    let permissionStatus: PermissionStatus | null = null;
-
-    navigator.permissions
-      .query({ name: "geolocation" as PermissionName })
-      .then((result) => {
-        if (cancelled) {
-          return;
-        }
-
-        permissionStatus = result;
-        const syncPermission = () => {
-          if (result.state === "granted") {
-            setLocationEnabled(true);
-          } else if (result.state === "denied") {
-            setStatus("denied");
-          }
-        };
-
-        syncPermission();
-        result.onchange = syncPermission;
-      })
-      .catch(() => {
-        // Older browsers may not expose permission state; avoid prompting until the user opts in.
-      });
-
-    return () => {
-      cancelled = true;
-      if (permissionStatus) {
-        permissionStatus.onchange = null;
-      }
-    };
-  }, [preference, setLocationEnabled]);
 
   useEffect(() => {
     if (!locationEnabled) {
