@@ -541,13 +541,13 @@ export function App() {
           <LastChanceBar
             departure={outgoingDeparture}
             driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
-            label="Last chance to leave and make the scheduled departure"
+            label="Last chance to make the scheduled departure"
             missedMessage={MISSED_SCHEDULED_DEPARTURE_MESSAGE}
           />
           <LastChanceBar
             departure={estimatedOutgoingDeparture}
             driveMinutes={location ? terminalTravelTimes?.driveMinutes : null}
-            label="Last chance to leave and make the estimated departure"
+            label="Last chance to make the estimated departure"
             missedMessage={MISSED_ESTIMATED_DEPARTURE_MESSAGE}
             variant="estimated"
           />
