@@ -10,6 +10,11 @@ export type Terminal = LatLng & {
   abbrev: string;
 };
 
+export type TerminalDirectionsDestination = {
+  location: LatLng;
+  placeId?: string;
+};
+
 export type FerryRoute = {
   id: string;
   name: string;
@@ -41,6 +46,14 @@ export const TERMINALS: Record<number, Terminal> = {
   20: { id: 20, name: "Southworth", shortName: "Southworth", abbrev: "SOU", lat: 47.5133, lng: -122.4951 },
   21: { id: 21, name: "Tahlequah", shortName: "Tahlequah", abbrev: "TAH", lat: 47.3327, lng: -122.5076 },
   22: { id: 22, name: "Vashon Island", shortName: "Vashon", abbrev: "VAS", lat: 47.5108, lng: -122.4643 }
+};
+
+export const TERMINAL_DIRECTIONS_DESTINATIONS: Record<number, TerminalDirectionsDestination> = {
+  // Google Maps' Winslow Ferry Terminal place routes to the drop-off area, not the drive-on ramp.
+  3: {
+    location: { lat: 47.623315, lng: -122.5107031 },
+    placeId: "ChIJA4NIhsc-kFQRwHCDpjPEjlQ"
+  }
 };
 
 function pairMates(a: number, b: number): Record<number, number> {
@@ -156,4 +169,8 @@ export function getRoute(routeId: string) {
 
 export function getTerminal(terminalId: number, terminals: Record<number, Terminal> = TERMINALS) {
   return terminals[terminalId] || TERMINALS[terminalId];
+}
+
+export function getTerminalDirectionsDestination(terminal: Terminal): TerminalDirectionsDestination {
+  return TERMINAL_DIRECTIONS_DESTINATIONS[terminal.id] || { location: terminal };
 }

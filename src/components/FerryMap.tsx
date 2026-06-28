@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { FerryRoute, LatLng, Terminal } from "../data/routes";
+import { getTerminalDirectionsDestination } from "../data/routes";
+import type { FerryRoute, LatLng, Terminal, TerminalDirectionsDestination } from "../data/routes";
 import type { VesselLocation } from "../types/wsdot";
 
 type FerryMapProps = {
@@ -46,6 +47,18 @@ type CachedTerminalRoute = {
 };
 
 type RouteTravelMode = "DRIVE" | "WALK";
+type RouteWaypoint =
+  | {
+      location: {
+        latLng: {
+          latitude: number;
+          longitude: number;
+        };
+      };
+    }
+  | {
+      placeId: string;
+    };
 
 let mapsPromise: Promise<GoogleMapsLoaderResult> | null = null;
 let mapsApiKeyPromise: Promise<string> | null = null;
@@ -237,10 +250,25 @@ function formatRouteDuration(duration?: string) {
   return remainingMinutes ? `${hours} hr ${remainingMinutes} min` : `${hours} hr`;
 }
 
+function toRouteWaypoint(destination: TerminalDirectionsDestination): RouteWaypoint {
+  if (destination.placeId) {
+    return { placeId: destination.placeId };
+  }
+
+  return {
+    location: {
+      latLng: {
+        latitude: destination.location.lat,
+        longitude: destination.location.lng
+      }
+    }
+  };
+}
+
 async function fetchTerminalRoute(
   apiKey: string,
   origin: LatLng,
-  destination: LatLng,
+  destination: TerminalDirectionsDestination,
   travelMode: RouteTravelMode,
   signal: AbortSignal
 ): Promise<TerminalRoute | null> {
@@ -261,14 +289,7 @@ async function fetchTerminalRoute(
           }
         }
       },
-      destination: {
-        location: {
-          latLng: {
-            latitude: destination.lat,
-            longitude: destination.lng
-          }
-        }
-      },
+      destination: toRouteWaypoint(destination),
       travelMode,
       ...(travelMode === "DRIVE" ? { routingPreference: "TRAFFIC_AWARE" } : {}),
       units: "IMPERIAL"
@@ -495,12 +516,12 @@ export function FerryMap({
       return () => abortController.abort();
     }
 
+    const routeDestination = getTerminalDirectionsDestination(departingTerminal);
     const cacheKey = [
       userLocation.lat.toFixed(4),
       userLocation.lng.toFixed(4),
       departingTerminal.id,
-      departingTerminal.lat.toFixed(4),
-      departingTerminal.lng.toFixed(4)
+      routeDestination.placeId || `${routeDestination.location.lat.toFixed(4)},${routeDestination.location.lng.toFixed(4)}`
     ].join(":");
 
     const applyTerminalRoutes = ({ driveRoute, walkRoute }: CachedTerminalRoute) => {
@@ -549,8 +570,8 @@ export function FerryMap({
     }
 
     Promise.all([
-      fetchTerminalRoute(apiKey, userLocation, departingTerminal, "DRIVE", abortController.signal),
-      fetchTerminalRoute(apiKey, userLocation, departingTerminal, "WALK", abortController.signal)
+      fetchTerminalRoute(apiKey, userLocation, routeDestination, "DRIVE", abortController.signal),
+      fetchTerminalRoute(apiKey, userLocation, routeDestination, "WALK", abortController.signal)
     ])
       .then(([driveRoute, walkRoute]) => {
         const terminalRoutes = { driveRoute, walkRoute };
