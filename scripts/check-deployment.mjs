@@ -32,9 +32,28 @@ try {
 
   const maps = await (await get("/api/maps/config")).json();
   assert.ok(typeof maps.apiKey === "string" && maps.apiKey.length > 0, "Maps configuration missing");
+  // Public test coordinates near Winslow, never a visitor's location.
+  const directions = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+    method: "POST",
+    signal: AbortSignal.timeout(20000),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": maps.apiKey,
+      "X-Goog-FieldMask": "routes.duration",
+      Referer: base.href
+    },
+    body: JSON.stringify({
+      origin: { location: { latLng: { latitude: 47.632, longitude: -122.52 } } },
+      destination: { placeId: "ChIJA4NIhsc-kFQRwHCDpjPEjlQ" },
+      travelMode: "DRIVE"
+    })
+  });
+  assert.equal(directions.status, 200, `Google Routes rejected production hostname: HTTP ${directions.status}`);
+  const route = await directions.json();
+  assert.ok(route.routes?.[0]?.duration, "Google Routes returned no travel time");
   const vessels = await (await get("/api/wsdot/vessels/vessellocations")).json();
   assert.ok(Array.isArray(vessels) && vessels.some((vessel) => typeof vessel.VesselID === "number"), "Live vessel data missing");
-  console.log(`Verified ${base.href}: matching HTML/assets, Maps configuration, and ${vessels.length} live vessels.`);
+  console.log(`Verified ${base.href}: matching HTML/assets, Google Maps/Routes access, and ${vessels.length} live vessels.`);
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

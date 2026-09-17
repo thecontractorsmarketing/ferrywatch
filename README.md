@@ -46,8 +46,8 @@ npm run deploy
 Pushes to GitHub `main` also deploy through `.github/workflows/deploy-cloudflare-pages.yml` when the repo has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_API_TOKEN` secrets configured.
 
 After deployment, the workflow checks the production hostname, compares the
-served HTML/assets with the build, and verifies Maps configuration and live
-WSDOT vessel data. Run the same check locally after `npm run build`:
+served HTML/assets with the build, and verifies Maps configuration, Google Routes
+access from the production hostname, and live WSDOT vessel data. Run the same check locally after `npm run build`:
 
 ```sh
 node scripts/check-deployment.mjs
