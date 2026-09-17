@@ -35,6 +35,8 @@ export function SettingsSheet({
   let locationLabel = "Off";
   if (locationStatus === "denied") {
     locationLabel = "Blocked";
+  } else if (locationStatus === "permission-required") {
+    locationLabel = "Permission needed";
   } else if (locationEnabled) {
     locationLabel = locationStatus === "requesting" ? "Updating" : "On";
   }
@@ -126,7 +128,13 @@ export function SettingsSheet({
           {locationEnabled ? (
             <button className="location-button" type="button" onClick={onRequestLocation}>
               <LocateFixed size={18} />
-              <span>{locationStatus === "requesting" ? "Updating location" : "Refresh location"}</span>
+              <span>
+                {locationStatus === "requesting"
+                  ? "Updating location"
+                  : locationStatus === "permission-required"
+                    ? "Allow location"
+                    : "Refresh location"}
+              </span>
             </button>
           ) : null}
         </div>
