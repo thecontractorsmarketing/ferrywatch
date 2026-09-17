@@ -309,7 +309,7 @@ export function App() {
   const pullActive = useRef(false);
   const pullDistanceValue = useRef(0);
   const pullStartY = useRef<number | null>(null);
-  const { location, status: locationStatus, locationEnabled, requestLocation, setLocationEnabled } = useGeolocation();
+  const { location, status: locationStatus, requestLocation } = useGeolocation();
 
   useEffect(() => {
     window.history.scrollRestoration = "manual";
@@ -641,11 +641,9 @@ export function App() {
           open={settingsOpen}
           prefs={prefs}
           route={route}
-          locationEnabled={locationEnabled}
           locationStatus={locationStatus}
           onClose={() => setSettingsOpen(false)}
           onRequestLocation={requestLocation}
-          onLocationEnabledChange={setLocationEnabled}
           onPrefsChange={setPrefs}
         />
       </section>

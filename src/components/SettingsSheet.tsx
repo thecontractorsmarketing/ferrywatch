@@ -6,11 +6,9 @@ type SettingsSheetProps = {
   open: boolean;
   prefs: FerryPrefs;
   route: FerryRoute;
-  locationEnabled: boolean;
   locationStatus: string;
   onClose: () => void;
   onRequestLocation: () => void;
-  onLocationEnabledChange: (enabled: boolean) => void;
   onPrefsChange: (prefs: FerryPrefs) => void;
 };
 
@@ -18,11 +16,9 @@ export function SettingsSheet({
   open,
   prefs,
   route,
-  locationEnabled,
   locationStatus,
   onClose,
   onRequestLocation,
-  onLocationEnabledChange,
   onPrefsChange
 }: SettingsSheetProps) {
   if (!open) {
@@ -32,12 +28,14 @@ export function SettingsSheet({
   const updatePrefs = (updates: Partial<FerryPrefs>) => {
     onPrefsChange({ ...prefs, ...updates });
   };
-  let locationLabel = "Off";
+  let locationLabel = "Always on";
   if (locationStatus === "denied") {
-    locationLabel = "Blocked";
+    locationLabel = "Blocked in browser";
   } else if (locationStatus === "permission-required") {
     locationLabel = "Permission needed";
-  } else if (locationEnabled) {
+  } else if (locationStatus === "unavailable") {
+    locationLabel = "Unavailable";
+  } else {
     locationLabel = locationStatus === "requesting" ? "Updating" : "On";
   }
 
@@ -115,28 +113,19 @@ export function SettingsSheet({
               <p className="section-label">Current location</p>
               <strong>{locationLabel}</strong>
             </div>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={locationEnabled}
-                onChange={(event) => onLocationEnabledChange(event.currentTarget.checked)}
-              />
-              <span />
-            </label>
+            <LocateFixed size={22} aria-hidden="true" />
           </div>
 
-          {locationEnabled ? (
-            <button className="location-button" type="button" onClick={onRequestLocation}>
-              <LocateFixed size={18} />
-              <span>
-                {locationStatus === "requesting"
-                  ? "Updating location"
-                  : locationStatus === "permission-required"
-                    ? "Allow location"
-                    : "Refresh location"}
-              </span>
-            </button>
-          ) : null}
+          <button className="location-button" type="button" onClick={onRequestLocation}>
+            <LocateFixed size={18} />
+            <span>
+              {locationStatus === "requesting"
+                ? "Updating location"
+                : locationStatus === "permission-required"
+                  ? "Allow location"
+                  : "Refresh location"}
+            </span>
+          </button>
         </div>
       </section>
     </div>
