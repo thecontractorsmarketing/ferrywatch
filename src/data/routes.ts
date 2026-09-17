@@ -64,7 +64,7 @@ export const ROUTES: FerryRoute[] = [
   {
     id: "sea-bi",
     name: "Seattle / Bainbridge",
-    color: "#ff9500",
+    color: "#2dd4bf",
     crossingMinutes: 35,
     abbrevs: ["sea-bi"],
     terminalIds: [7, 3],

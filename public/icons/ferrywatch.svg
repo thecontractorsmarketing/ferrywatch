@@ -1,17 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="WSF FerryWatch">
-  <defs>
-    <linearGradient id="sky" x1="72" y1="450" x2="432" y2="50" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#03182f"/>
-      <stop offset="0.58" stop-color="#075da5"/>
-      <stop offset="1" stop-color="#18a5ec"/>
-    </linearGradient>
-    <linearGradient id="wake" x1="66" y1="408" x2="446" y2="374" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ff7a00"/>
-      <stop offset="1" stop-color="#ffb000"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#sky)"/>
-  <path d="M68 132h76l23 145 60-145h67l24 145 55-145h72l-91 246h-73l-24-134-27 134h-74z" fill="#fff"/>
-  <path d="M69 404c92-41 169-35 233-2 51 26 93 22 145-9-39 54-92 72-151 45-72-32-139-34-227 4z" fill="url(#wake)"/>
-  <path d="M84 420c77-20 140-11 201 14 49 20 96 18 148-6-47 48-104 57-164 31-55-24-112-30-185-12z" fill="#fff" opacity=".92"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#071c26"/>
+  <path d="M90 335c43 31 79 31 122 0s85-31 128 0 79 31 122 0v47c-43 31-79 31-122 0s-85-31-128 0-79 31-122 0z" fill="#7dd3fc"/>
+  <path d="M132 244h248l42 68H91z" fill="#f8fafc"/>
+  <path d="M167 167h178l35 77H132z" fill="#d9f99d"/>
+  <path d="M181 196h34v30h-34zm58 0h34v30h-34zm58 0h34v30h-34z" fill="#071c26"/>
+  <path d="M236 119h40v48h-40z" fill="#f97316"/>
 </svg>

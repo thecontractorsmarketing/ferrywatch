@@ -1,6 +1,6 @@
 :root {
-  color: #061a2f;
-  background: #03182f;
+  color: #13211f;
+  background: #102522;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
@@ -34,8 +34,8 @@ button {
   min-height: 100svh;
   justify-content: center;
   background:
-    radial-gradient(circle at 73% 12%, rgba(22, 165, 233, 0.44), transparent 27%),
-    linear-gradient(152deg, #063b6b 0%, #03182f 58%, #020f1f 100%);
+    linear-gradient(180deg, rgba(26, 61, 51, 0.96), rgba(16, 37, 34, 0.98)),
+    #102522;
 }
 
 .phone-canvas {
@@ -45,9 +45,7 @@ button {
   padding: calc(6px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom));
   overflow-x: hidden;
   overscroll-behavior-y: contain;
-  background:
-    linear-gradient(180deg, rgba(226, 244, 255, 0.72), rgba(246, 250, 255, 0) 250px),
-    #f4f8fc;
+  background: #f4f7f1;
 }
 
 .top-bar {
@@ -58,52 +56,19 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 64px;
-  margin: 0 -16px 12px;
-  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
-  color: #fff;
-  background:
-    linear-gradient(120deg, rgba(3, 24, 47, 0.98), rgba(6, 85, 145, 0.96)),
-    #063b6b;
+  min-height: 52px;
+  margin: 0 -16px 10px;
+  padding: 9px 16px 8px;
+  color: #f9faf4;
+  background: rgba(13, 55, 49, 0.96);
   backdrop-filter: blur(18px);
-  box-shadow: 0 8px 24px rgba(3, 24, 47, 0.2);
 }
 
 .brand-lockup {
   display: flex;
   min-width: 0;
-  align-items: center;
-  gap: 10px;
-}
-
-.brand-icon {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  border-radius: 11px;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
-}
-
-.brand-wordmark {
-  display: grid;
-  min-width: 0;
-  line-height: 0.9;
-  transform: skewX(-7deg);
-}
-
-.brand-wordmark strong {
-  color: #fff;
-  font-size: 1.52rem;
-  font-weight: 950;
-  letter-spacing: -0.07em;
-}
-
-.brand-wordmark span {
-  color: #ff9d00;
-  font-size: 0.7rem;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .app-kicker,
@@ -113,11 +78,18 @@ button {
 .stat-card p,
 .sailing-row span {
   margin: 0;
-  color: #5b6b7d;
+  color: #65726b;
   font-size: 0.73rem;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.top-bar .app-kicker {
+  flex: 0 0 auto;
+  color: #9cebd6;
+  font-size: 0.64rem;
+  line-height: 1;
 }
 
 .top-bar h1,
@@ -157,7 +129,7 @@ button {
   flex: 0 0 42px;
   border-radius: 999px;
   color: inherit;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.13);
 }
 
 .top-bar .icon-button {
@@ -178,10 +150,10 @@ button {
 .stat-card,
 .travel-card,
 .schedule-panel {
-  border: 1px solid rgba(6, 59, 107, 0.09);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 12px 28px rgba(4, 42, 78, 0.09);
+  border: 1px solid rgba(16, 37, 34, 0.09);
+  border-radius: 8px;
+  background: #fffef9;
+  box-shadow: 0 12px 28px rgba(24, 45, 40, 0.08);
 }
 
 .route-card {
@@ -195,12 +167,12 @@ button {
   grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-  color: #073a6b;
+  color: #0f3d37;
 }
 
 .route-line svg {
   justify-self: center;
-  color: #ff9500;
+  color: #e35d2f;
 }
 
 .route-swap-button {
@@ -208,10 +180,10 @@ button {
   width: 42px;
   height: 42px;
   place-items: center;
-  border: 1px solid rgba(255, 149, 0, 0.28);
+  border: 1px solid rgba(227, 93, 47, 0.22);
   border-radius: 999px;
-  color: #d97706;
-  background: #fff4dc;
+  color: #e35d2f;
+  background: #fff7ed;
   cursor: pointer;
 }
 
@@ -222,10 +194,10 @@ button {
 .terminal-pill {
   min-width: 0;
   overflow: hidden;
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 9px 12px;
-  color: #fff;
-  background: linear-gradient(135deg, #073a6b, #075b9e);
+  color: #f8fff8;
+  background: #0f3d37;
   font-size: 0.98rem;
   font-weight: 800;
   text-align: center;
@@ -244,8 +216,8 @@ button {
   justify-content: flex-start;
   border-radius: 8px;
   padding: 9px 10px;
-  color: #7a3d00;
-  background: #fff0d9;
+  color: #7c2d12;
+  background: #ffedd5;
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -264,9 +236,9 @@ button {
   height: 334px;
   margin-top: 14px;
   overflow: hidden;
-  border-radius: 12px;
-  background: #d9efff;
-  box-shadow: 0 16px 36px rgba(4, 42, 78, 0.16);
+  border-radius: 8px;
+  background: #d8efe8;
+  box-shadow: 0 16px 36px rgba(24, 45, 40, 0.14);
 }
 
 .route-map {
@@ -288,10 +260,8 @@ button {
   display: grid;
   place-items: center;
   padding: 18px;
-  color: #073a6b;
-  background:
-    radial-gradient(circle at 80% 18%, rgba(255, 255, 255, 0.9), transparent 26%),
-    linear-gradient(180deg, #a9ddfb, #dceffd);
+  color: #0f3d37;
+  background: #d8efe8;
   font-size: 0.86rem;
   font-weight: 800;
   text-align: center;
@@ -309,15 +279,15 @@ button {
   border: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.32);
   padding: 5px 11px 6px;
-  color: #fff;
-  background: #07518f;
+  color: #fbfff8;
+  background: #174a43;
   cursor: pointer;
   text-align: left;
 }
 
 .map-glass:active {
   transform: none;
-  background: #063b6b;
+  background: #0f3d37;
 }
 
 .map-status-left {
@@ -353,12 +323,12 @@ button {
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
   padding: 6px 11px 7px;
-  color: #fff;
-  background: #063b6b;
+  color: #fbfff8;
+  background: #0f3d37;
 }
 
 .last-chance-bar.is-estimated {
-  background: #0a4f80;
+  background: #17415a;
 }
 
 .last-chance-label,
@@ -370,7 +340,7 @@ button {
 .last-chance-label {
   flex: 1 1 155px;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(251, 255, 248, 0.78);
   font-size: 0.71rem;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -389,7 +359,7 @@ button {
 }
 
 .last-chance-bar.is-missed {
-  background: #9f312c;
+  background: #68342f;
 }
 
 .last-chance-bar.is-missed .last-chance-label {
@@ -419,14 +389,14 @@ button {
 .stat-card strong {
   display: block;
   margin-top: 4px;
-  color: #061a2f;
+  color: #102522;
   font-size: clamp(1.18rem, 6vw, 1.48rem);
   line-height: 1.05;
   letter-spacing: 0;
 }
 
 .stat-card strong.is-late-arrival {
-  color: #b42318;
+  color: #a85c55;
 }
 
 .travel-card {
@@ -441,7 +411,7 @@ button {
 .travel-card span {
   min-width: 0;
   overflow: hidden;
-  color: #5b6b7d;
+  color: #65726b;
   font-size: 0.72rem;
   font-weight: 800;
   line-height: 1;
@@ -453,7 +423,7 @@ button {
 .travel-card strong {
   min-width: 0;
   overflow: hidden;
-  color: #061a2f;
+  color: #102522;
   font-size: 0.92rem;
   font-weight: 900;
   line-height: 1;
@@ -463,11 +433,11 @@ button {
 }
 
 .travel-card strong.is-travel-safe {
-  color: #0277bd;
+  color: #0f766e;
 }
 
 .travel-card strong.is-travel-tight {
-  color: #b42318;
+  color: #a85c55;
 }
 
 .stat-detail {
@@ -475,7 +445,7 @@ button {
   min-width: 0;
   margin-top: 6px;
   overflow: hidden;
-  color: #5b6b7d;
+  color: #5f6e67;
   font-size: 0.78rem;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -498,17 +468,17 @@ button {
 }
 
 .stat-detail.travel-stack span.departure-estimate {
-  color: #5b6b7d;
+  color: #65726b;
   font-size: 0.73rem;
   text-transform: uppercase;
 }
 
 .stat-detail.travel-stack span.is-travel-safe {
-  color: #0277bd;
+  color: #0f766e;
 }
 
 .stat-detail.travel-stack span.is-travel-tight {
-  color: #b42318;
+  color: #a85c55;
 }
 
 .stat-icon {
@@ -517,8 +487,8 @@ button {
   height: 34px;
   place-items: center;
   border-radius: 8px;
-  color: #07518f;
-  background: #e1f3ff;
+  color: #0f3d37;
+  background: #ccfbf1;
 }
 
 .schedule-panel {
@@ -537,7 +507,7 @@ button {
 
 .panel-heading h2,
 .sheet-header h2 {
-  color: #061a2f;
+  color: #102522;
   font-size: 1rem;
 }
 
@@ -547,8 +517,8 @@ button {
   min-height: 36px;
   border-radius: 8px;
   padding: 0 10px;
-  color: #07518f;
-  background: #e4f3ff;
+  color: #0f3d37;
+  background: #dff7ef;
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -565,7 +535,7 @@ button {
   justify-content: space-between;
   gap: 12px;
   min-height: 43px;
-  border-top: 1px solid rgba(6, 59, 107, 0.09);
+  border-top: 1px solid rgba(16, 37, 34, 0.08);
   padding: 5px 0;
 }
 
@@ -581,16 +551,16 @@ button {
 
 .sailing-row strong {
   display: inline-block;
-  color: #061a2f;
+  color: #102522;
   font-size: 0.95rem;
 }
 
 .sailing-row.is-previous strong {
-  color: #78889a;
+  color: #7c8983;
 }
 
 .sailing-row.is-previous span {
-  color: #9aa8b6;
+  color: #98a49e;
 }
 
 .sailing-row span {
@@ -604,7 +574,7 @@ button {
 .sailing-departure span {
   display: inline-block;
   max-width: none;
-  color: #65778a;
+  color: #64736b;
   font-size: 0.64rem;
   line-height: 1;
 }
@@ -616,11 +586,11 @@ button {
   justify-content: space-between;
   gap: 10px;
   margin-top: 14px;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 11px 12px;
-  color: #fff;
-  background: linear-gradient(120deg, #03182f, #07518f);
-  box-shadow: 0 12px 28px rgba(4, 42, 78, 0.16);
+  color: #f9faf4;
+  background: #0d3731;
+  box-shadow: 0 12px 28px rgba(24, 45, 40, 0.12);
 }
 
 .footer-route,
@@ -632,7 +602,7 @@ button {
 
 .footer-route span,
 .footer-updated span {
-  color: #ffb23f;
+  color: #9cebd6;
   font-size: 0.62rem;
   line-height: 1;
 }
@@ -641,7 +611,7 @@ button {
 .footer-updated strong {
   min-width: 0;
   overflow: hidden;
-  color: #fff;
+  color: #f9faf4;
   font-size: 1rem;
   line-height: 1.12;
   text-overflow: ellipsis;
@@ -675,23 +645,23 @@ button {
   align-items: flex-end;
   justify-content: center;
   padding: 12px;
-  background: rgba(3, 24, 47, 0.58);
+  background: rgba(8, 26, 23, 0.45);
 }
 
 .settings-sheet {
   width: min(100%, 430px);
   max-height: min(84svh, 760px);
   overflow-y: auto;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 14px;
-  color: #061a2f;
-  background: #fff;
-  box-shadow: 0 -24px 70px rgba(3, 24, 47, 0.32);
+  color: #13211f;
+  background: #fffef9;
+  box-shadow: 0 -24px 70px rgba(6, 25, 22, 0.32);
 }
 
 .settings-sheet .icon-button {
-  color: #061a2f;
-  background: #eaf3fb;
+  color: #13211f;
+  background: #edf3ea;
 }
 
 .settings-section {
@@ -711,11 +681,11 @@ button {
   align-items: center;
   gap: 10px;
   min-height: 46px;
-  border: 1px solid rgba(6, 59, 107, 0.12);
-  border-radius: 10px;
+  border: 1px solid rgba(16, 37, 34, 0.11);
+  border-radius: 8px;
   padding: 0 10px;
-  color: #061a2f;
-  background: #f6faff;
+  color: #13211f;
+  background: #f7faf3;
   font-weight: 800;
   text-align: left;
 }
@@ -728,8 +698,8 @@ button {
 }
 
 .route-option.is-selected {
-  border-color: rgba(2, 132, 199, 0.42);
-  background: #e4f4ff;
+  border-color: rgba(15, 61, 55, 0.42);
+  background: #e6f8f1;
 }
 
 .route-color {
@@ -741,7 +711,7 @@ button {
 .setting-row strong {
   display: block;
   margin-top: 3px;
-  color: #061a2f;
+  color: #13211f;
 }
 
 .switch {
@@ -760,7 +730,7 @@ button {
 .switch span {
   width: 100%;
   border-radius: 999px;
-  background: #bfccda;
+  background: #cbd5c7;
   transition:
     background 180ms ease,
     box-shadow 180ms ease;
@@ -773,14 +743,14 @@ button {
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(3, 24, 47, 0.25);
+  background: #fffef9;
+  box-shadow: 0 2px 6px rgba(16, 37, 34, 0.25);
   content: "";
   transition: transform 180ms ease;
 }
 
 .switch input:checked + span {
-  background: #0284c7;
+  background: #0f766e;
 }
 
 .switch input:checked + span::after {
@@ -797,20 +767,20 @@ button {
   min-width: 0;
   min-height: 42px;
   overflow: hidden;
-  border: 1px solid rgba(6, 59, 107, 0.12);
-  border-radius: 10px;
+  border: 1px solid rgba(16, 37, 34, 0.12);
+  border-radius: 8px;
   padding: 0 8px;
-  color: #061a2f;
-  background: #f6faff;
+  color: #13211f;
+  background: #f7faf3;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .terminal-toggle button.is-selected {
-  border-color: rgba(2, 132, 199, 0.5);
-  color: #fff;
-  background: #07518f;
+  border-color: rgba(15, 61, 55, 0.44);
+  color: #f8fff8;
+  background: #0f3d37;
 }
 
 .location-button {
@@ -829,30 +799,30 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 5px 18px rgba(3, 24, 47, 0.24);
+  background: #fffef9;
+  box-shadow: 0 5px 18px rgba(6, 25, 22, 0.24);
 }
 
 .vessel-marker span::before {
   position: absolute;
   inset: 7px 9px;
   clip-path: polygon(50% 0, 100% 100%, 50% 78%, 0 100%);
-  background: var(--route-color, #0ea5e9);
+  background: var(--route-color, #2dd4bf);
   content: "";
 }
 
 .vessel-marker.is-active span {
-  outline: 4px solid rgba(255, 149, 0, 0.28);
+  outline: 4px solid rgba(227, 93, 47, 0.24);
 }
 
 .user-marker span {
   display: block;
   width: 22px;
   height: 22px;
-  border: 3px solid #fff;
+  border: 3px solid #fffef9;
   border-radius: 999px;
-  background: #0284c7;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.34);
+  background: #2563eb;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32);
 }
 
 .pull-refresh-indicator {
@@ -866,9 +836,9 @@ button {
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 999px;
-  color: #fff;
-  background: rgba(6, 59, 107, 0.94);
-  box-shadow: 0 8px 18px rgba(3, 24, 47, 0.24);
+  color: #e7fff7;
+  background: rgba(10, 50, 45, 0.9);
+  box-shadow: 0 8px 18px rgba(6, 25, 22, 0.22);
   pointer-events: none;
   transition:
     opacity 120ms ease,
@@ -876,7 +846,7 @@ button {
 }
 
 .pull-refresh-indicator.is-ready {
-  background: #ff9500;
+  background: #0f766e;
 }
 
 .spin {
@@ -899,7 +869,7 @@ button {
     height: min(932px, calc(100svh - 48px));
     min-height: 0;
     overflow-y: auto;
-    border: 10px solid #020f1f;
+    border: 10px solid #0b1715;
     border-radius: 34px;
     box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
   }

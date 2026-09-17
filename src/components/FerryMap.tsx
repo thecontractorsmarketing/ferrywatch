@@ -69,14 +69,14 @@ function svgUrl(svg: string) {
 
 function vesselColor(vessel: VesselLocation, departingTerminalId: number, arrivingTerminalId: number) {
   if (vessel.DepartingTerminalID === departingTerminalId) {
-    return "#0ea5e9";
+    return "#0f766e";
   }
 
   if (vessel.DepartingTerminalID === arrivingTerminalId) {
-    return "#ff9500";
+    return "#e35d2f";
   }
 
-  return "#073a6b";
+  return "#0f3d37";
 }
 
 function vesselHeading(vessel: VesselLocation) {
@@ -108,7 +108,7 @@ function vesselIcon(maps: GoogleMapsNamespace, vessel: VesselLocation, departing
 function userIcon(maps: GoogleMapsNamespace) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-      <circle cx="13" cy="13" r="10" fill="#0284c7" stroke="#ffffff" stroke-width="4"/>
+      <circle cx="13" cy="13" r="10" fill="#2563eb" stroke="#fffef9" stroke-width="4"/>
     </svg>
   `;
 
@@ -555,7 +555,7 @@ export function FerryMap({
         routeLineRef.current = new maps.Polyline({
           map,
           path: terminalRoute.path,
-          strokeColor: "#0284c7",
+          strokeColor: "#2563eb",
           strokeOpacity: 0.48,
           strokeWeight: 3
         });
